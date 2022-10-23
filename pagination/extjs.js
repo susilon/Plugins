@@ -85,15 +85,15 @@ $.fn.dataTableExt.oPagination.extStyle = {
         }).bind('selectstart', function () { return false; });
   
         nPageNumBox.change(function () {
-            var pageValue = parseInt($(this).val(), 10) - 1 ; // -1 because pages are 0 indexed, but the UI is 1
-            var oPaging = oSettings.oInstance.fnPagingInfo();
-            
-            if(pageValue === NaN || pageValue<0 ){
-                pageValue = 0;
-            }else if(pageValue >= oPaging.iTotalPages ){
-                pageValue = oPaging.iTotalPages -1;
+            var iNewStart = oSettings._iDisplayLength * (this.value - 1);
+            if (iNewStart < 0) {
+                iNewStart = 0;
             }
-            oSettings.oApi._fnPageChange(oSettings, pageValue);
+            if (iNewStart >= oSettings.fnRecordsDisplay()) {
+                iNewStart = (Math.ceil((oSettings.fnRecordsDisplay()) / oSettings._iDisplayLength) - 1) * oSettings._iDisplayLength;
+            }
+            oSettings._iDisplayStart = iNewStart;
+            oSettings.oInstance.trigger("page.dt", oSettings);
             fnCallbackDraw(oSettings);
         });
   
